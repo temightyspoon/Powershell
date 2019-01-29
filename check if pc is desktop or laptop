@@ -1,0 +1,36 @@
+#Check if Remote PC is a Laptop
+
+#Defines an Array to store data
+$array = @()
+
+#Define the Computers to be tested
+#Pulls the list from a text file.
+$TxtFile = "C:\TEMP\text-files\HO-PC's.txt"
+$Computers = Get-Content $TxtFile
+ 
+foreach($Computer in $Computers) 
+
+{
+    $computerSystem = get-wmiobject Win32_ComputerSystem -Computer $Computer
+    $Computerchassis = Get-WmiObject Win32_SystemEnclosure -Computer $Computer
+    $ComputerBattery = Get-WmiObject Win32_Battery -Computer $Computer
+    $islaptop =$false
+
+    if($Computerchassis | Where-Object { $_.chassistypes -eq 9 -or $_.chassistypes -eq 10 -or $_.chassistypes -eq 14})
+    { $isLaptop = $true }
+
+    if($ComputerBattery) {$islaptop = $true }
+
+    $islaptop
+
+    $export = [PScustomobject]@{
+    Computer = $Computer
+    Laptop = $islaptop
+        }
+
+        $array+= $export
+
+
+ }
+
+ $array | Export-Csv -Path 'C:\Temp\pc info\misc\laptop.csv' -force -NoTypeInformation
