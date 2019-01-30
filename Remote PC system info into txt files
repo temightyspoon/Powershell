@@ -1,13 +1,9 @@
-
-#Clear the Text File
-#Clear-Content $Txtfile
-
-
 #Define the Computers to be inventorised 
-$txtfile = "C:\temp\ph.txt"
+$txtfile = "C:\temp\PC list.txt"
 $Computers = Get-Content $TxtFile
  
-
+#runs through each machine defined in the txt file
+#pulls in all of the information, and dumps it into a .txt file named after the machine
 foreach($Computer in $Computers) 
 
 {
@@ -51,7 +47,7 @@ foreach($Computer in $Computers)
                              "DISK INFORMATION"
                              ""
                              )
-
+          #adds in the above inventory information to the $PCfile
                        add-content -path $Dir\$Pcfile $inventory       
 
       foreach ($disk in $disks) 
@@ -69,19 +65,7 @@ foreach($Computer in $Computers)
                             
                             "-----------------"
                              )
+          #adds all of the above disk information to the end of the $Pcfile
                        add-content -path $Dir\$Pcfile $data
     }
 }
-
- $file = "C:\serverinfo1.txt"
-
-      $mailsettings = @{
-'SmtpServer'  = "mailsvr01.briscoes-nz.co.nz"
-'To' = "aaron.buchan@briscoegroup.co.nz", "stuartg@briscoes.co.nz"
-'From' = " Sever System Info <sender@briscoes.co.nz>"
-'Subject' = "Server System Info"
-'Body' = "System Info For Briscoes Servers"
-'Attachments' = $file
-}
-
-#Send-MailMessage @mailsettings
