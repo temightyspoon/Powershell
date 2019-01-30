@@ -16,6 +16,7 @@ foreach($Computer in $Computers)
     $Networkconfig = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName $Computer
     $PcFile = $computerSystem.Name + ".TXT"
 
+#Creates an object to hold all of the inventory data of the currently queried machine.
       [Object[]] $Inventory = @("SERVER: " + $computerSystem.Name, ` 
                              ""   
                              ""
