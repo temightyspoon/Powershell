@@ -1,0 +1,87 @@
+
+#Clear the Text File
+#Clear-Content $Txtfile
+
+
+#Define the Computers to be inventorised 
+$txtfile = "C:\temp\ph.txt"
+$Computers = Get-Content $TxtFile
+ 
+
+foreach($Computer in $Computers) 
+
+{
+    $computerSystem = get-wmiobject Win32_ComputerSystem -Computer $Computer
+    $computerBIOS = get-wmiobject Win32_BIOS -Computer $Computer
+    $computerOS = get-wmiobject Win32_OperatingSystem -Computer $Computer
+    $computerCPU = get-wmiobject Win32_Processor -Computer $Computer
+    $computerHDDs = Get-WmiObject Win32_LogicalDisk -ComputerName $Computer -Filter drivetype=3 
+    $disks = Get-WmiObject Win32_LogicalDisk -ComputerName $Computer -Filter drivetype=3 
+    $Networkconfig = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter IPEnabled=TRUE -ComputerName $Computer
+    $PcFile = $computerSystem.Name + ".TXT"
+
+      [Object[]] $Inventory = @("SERVER: " + $computerSystem.Name, ` 
+                             ""   
+                             ""
+                             "HARDWARE INFORMATION"
+                             "--------------------"
+                             "Operating System: " + $computerOS.Caption,`
+                             ""
+                             "Service Pack: " + $computerOS.CSDVersion, `
+                             ""
+                             "Architecture: " + $computerOS.OSArchitecture, `
+                             ""
+                             "Current Status: " + $computerOS.Status, `
+                             ""
+                             "Manufacturer: " + $computerSystem.Manufacturer, ` 
+                             ""                           
+                             "Model: " + $computerSystem.Model, `
+                             ""
+                             "Serial Number: " + $computerBIOS.SerialNumber, ` 
+                             ""
+                             "CPU: " + $computerCPU.Name -join "-", ` 
+                             ""
+                             "RAM: " + "{0:N2}" -f ($computerSystem.TotalPhysicalMemory/1GB) + "GB", ` 
+                             ""
+                             "IP Address: " + $NetworkConfig.IpAddress -join "-", ` 
+                             ""
+                             "MAC Address: " + $NetworkConfig.MACAddress
+                             "----------------------"
+                             ""                            
+                             "DISK INFORMATION"
+                             ""
+                             )
+
+                       add-content -path $Dir\$Pcfile $inventory       
+
+      foreach ($disk in $disks) 
+    { 
+        [Object[]] $data = @("Drive: " + $disk.DeviceID, `
+                            ""
+                            "Drive Name: " + $disk.VolumeName, ` 
+                            ""
+                            "Disk Size: " + [Math]::Round(($disk.Size /1GB), 0) + "GB", ` 
+                            ""
+                            "Used Space: " + [Math]::Round(($disk.Size - $disk.FreeSpace) /1GB, 0) + "GB"
+                            
+                            "Free Space: " + [Math]::Round(($disk.FreeSpace / 1GB), 0) + "GB", ` 
+                            ""
+                            
+                            "-----------------"
+                             )
+                       add-content -path $Dir\$Pcfile $data
+    }
+}
+
+ $file = "C:\serverinfo1.txt"
+
+      $mailsettings = @{
+'SmtpServer'  = "mailsvr01.briscoes-nz.co.nz"
+'To' = "aaron.buchan@briscoegroup.co.nz", "stuartg@briscoes.co.nz"
+'From' = " Sever System Info <sender@briscoes.co.nz>"
+'Subject' = "Server System Info"
+'Body' = "System Info For Briscoes Servers"
+'Attachments' = $file
+}
+
+#Send-MailMessage @mailsettings
