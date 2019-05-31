@@ -15,8 +15,8 @@ $location = Get-ChildItem -Path $path -Recurse -Filter "*.pst"
 
 $psts = $location.fullname
 
-$makes a new directory to house the PST, named after the machine its copied from
-md E:\psts\$pc
+#makes a new directory to house the PST, named after the machine its copied from
+mkdir E:\psts\$pc
 
 foreach($pst in $psts){
 
